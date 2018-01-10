@@ -1,6 +1,6 @@
 ident_ch = _{ 'a'..'z' | 'A'..'Z' | '0'..'9' | "_" | "-" }
-ident = @{ ( 'a'..'z' | '0'..'9' | "_" | "-" ) ~ ident_ch* }
-variable = @{ ( 'A'..'Z' ) ~ ident_ch* }
+ident = @{ ( 'a'..'z' | '0'..'9' | "-" ) ~ ident_ch* }
+variable = @{ ( 'A'..'Z' | "_" ) ~ ident_ch* }
 
 raw_ch = { !("\\" | "\"") ~ any }
 hex_digit = { '0'..'9' | 'a'..'f' | 'A'..'F' }

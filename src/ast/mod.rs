@@ -1,7 +1,12 @@
-//! The Datalog basic AST.
+//! The basic Datalog AST.
 
 mod symbol;
 mod variable;
+
+use std::path::Path;
+use std::str::FromStr;
+
+use errors::{Error, Result};
 
 pub use self::symbol::Symbol;
 pub use self::variable::Variable;
@@ -9,6 +14,20 @@ pub use self::variable::Variable;
 /// A complete program; really just a bunch of statements.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Program(pub Vec<Statement>);
+
+impl Program {
+    /// Parses a file and returns the `Program` inside it.
+    pub fn parse_file<P: AsRef<Path>>(path: P) -> Result<Program> {
+        ::parser::parse_program_file(path)
+    }
+}
+
+impl FromStr for Program {
+    type Err = Error;
+    fn from_str(src: &str) -> Result<Program> {
+        ::parser::parse_program_string(src)
+    }
+}
 
 /// A statement in a program, either an assertion, retraction, or query.
 ///
@@ -39,6 +58,13 @@ pub enum Statement {
     /// A query, which produces all possible instantiations of its variables,
     /// or simply `true`.
     Query(Literal),
+}
+
+impl FromStr for Statement {
+    type Err = Error;
+    fn from_str(src: &str) -> Result<Statement> {
+        ::parser::parse_stmt(&src)
+    }
 }
 
 /// A term, for example `foo`, `Bar`, or `baz(1, 2)`.

@@ -18,7 +18,7 @@ impl Symbol {
     /// Returns whether the string is a valid symbol.
     pub fn is_valid(s: &str) -> bool {
         if let Some(ch) = s.chars().next() {
-            !('A' <= ch && ch <= 'Z')
+            !(('A' <= ch && ch <= 'Z') || ch == '_')
         } else {
             false
         }

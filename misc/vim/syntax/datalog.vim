@@ -14,8 +14,8 @@ syn keyword datalogOperator :- , ( )
 syn keyword datalogCommentTodo BUG FIXME TODO XXX contained
 syn match datalogComment "%.*" contains=datalogCommentTodo
 
-syn match datalogIdent "[a-z0-9_-][a-zA-Z0-9_-]*"
-syn match datalogVariable "[A-Z][a-zA-Z0-9_-]*"
+syn match datalogIdent "[a-z0-9-][a-zA-Z0-9_-]*"
+syn match datalogVariable "[A-Z_][a-zA-Z0-9_-]*"
 
 syn region datalogString start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=datalogStringEsc,datalogStringHex2,datalogStringHex4,datalogStringHex8,datalogStringEscUnknown
 syn match datalogStringEscUnknown "\\." contained

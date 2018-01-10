@@ -53,9 +53,9 @@ impl Into<String> for Variable {
 
 fn is_var_char(ch: char) -> bool {
     ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z')
-        || ('0' <= ch && ch <= '9') || ch == '_' || ch == '-'
+        || ('0' <= ch && ch <= '9') || ch == '-'
 }
 
 fn is_var_start_char(ch: char) -> bool {
-    'A' <= ch && ch <= 'Z'
+    ('A' <= ch && ch <= 'Z') || ch == '_'
 }
