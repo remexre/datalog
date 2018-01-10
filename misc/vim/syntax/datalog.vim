@@ -9,8 +9,6 @@ if exists("b:current_syntax")
   finish
 endif
 
-syn keyword datalogBuiltins
-
 syn keyword datalogOperator :- , ( )
 
 syn keyword datalogCommentTodo BUG FIXME TODO XXX contained
@@ -27,8 +25,6 @@ syn match datalogStringHex4 "\\u[0-9a-fA-F]\{4\}" contained
 syn match datalogStringHex8 "\\U[0-9a-fA-F]\{8\}" contained
 
 let b:current_syntax = "datalog"
-
-hi link datalogBuiltins Function
 
 hi link datalogPunctuation Operator
 
