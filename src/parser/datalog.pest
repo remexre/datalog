@@ -1,0 +1,34 @@
+ident_ch = _{ 'a'..'z' | 'A'..'Z' | '0'..'9' | "_" | "-" }
+ident = @{ ( 'a'..'z' | '0'..'9' | "_" | "-" ) ~ ident_ch* }
+variable = @{ ( 'A'..'Z' ) ~ ident_ch* }
+
+raw_ch = { !("\\" | "\"") ~ any }
+hex_digit = { '0'..'9' | 'a'..'f' | 'A'..'F' }
+hex_esc = { "x" ~ hex_digit{2} }
+uni4_esc = { "u" ~ hex_digit{4} }
+uni8_esc = { "U" ~ hex_digit{8} }
+predef_esc = { "n" | "r" | "t" | "\\" | "\"" | "'" }
+esc_ch = { "\\" ~ (hex_esc | uni4_esc | uni8_esc | predef_esc) }
+string = ${ "\"" ~ (raw_ch | esc_ch)* ~ "\"" }
+
+symbol = { ident | string }
+
+literal = { symbol ~ ("(" ~ term_list? ~ ")")? }
+literal_list = { literal ~ ("," ~ literal)* }
+
+term = { variable | literal }
+term_list = { term ~ ("," ~ term)* }
+
+clause = { literal ~ (":-" ~ literal_list)? }
+
+assertion = { clause ~ "." }
+retraction = { clause ~ "~" }
+query = { literal ~ "?" }
+stmt = { assertion | retraction | query }
+
+program = { soi ~ stmt* ~ eoi }
+stmt_all = { soi ~ stmt* ~ eoi }
+
+whitespace = _{ " " | "\t" | line_break }
+line_break = _{ "\n" | "\r" }
+comment = { "%" ~ (!line_break ~ any)* ~ line_break }
