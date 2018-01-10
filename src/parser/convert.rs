@@ -97,12 +97,10 @@ pub fn convert_term_one<I: Input>(
     pairs: Pairs<Rule, I>,
 ) -> Result<Term, Error<Rule, I>> {
     as_one_any(pairs, Rule::term, |token| match token.as_rule() {
-        Rule::literal => {
-            convert_literal_one(token.into_inner()).map(Term::Literal)
-        }
+        Rule::name => convert_name_one(token.into_inner()).map(Term::Name),
         Rule::variable => Ok(Term::Variable(convert_variable_one(token))),
         _ => Err(Error::ParsingError {
-            positives: vec![Rule::literal, Rule::variable],
+            positives: vec![Rule::name, Rule::variable],
             negatives: vec![],
             pos: token.into_span().start_pos(),
         }),

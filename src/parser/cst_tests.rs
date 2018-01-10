@@ -116,10 +116,8 @@ fn literals() {
                 ]),
                 term_list(2, 5, [
                     term(2, 5, [
-                        literal(2, 5, [
-                            name(2, 5, [
-                                ident(2, 5),
-                            ]),
+                        name(2, 5, [
+                            ident(2, 5),
                         ]),
                     ]),
                 ]),
@@ -137,17 +135,13 @@ fn literals() {
                 ]),
                 term_list(7, 20, [
                     term(7, 11, [
-                        literal(7, 11, [
-                            name(7, 11, [
-                                ident(7, 11),
-                            ]),
+                        name(7, 11, [
+                            ident(7, 11),
                         ]),
                     ]),
                     term(13, 20, [
-                        literal(13, 20, [
-                            name(13, 20, [
-                                ident(13, 20),
-                            ]),
+                        name(13, 20, [
+                            ident(13, 20),
                         ]),
                     ]),
                 ]),
@@ -165,26 +159,22 @@ fn literals() {
                 ]),
                 term_list(5, 19, [
                     term(5, 7, [
-                        literal(5, 7, [
-                            name(5, 7, [
-                                ident(5, 7),
-                            ]),
+                        name(5, 7, [
+                            ident(5, 7),
                         ]),
                     ]),
                     term(9, 19, [
-                        literal(9, 19, [
-                            name(9, 19, [
-                                string(9, 19, [
-                                    esc_ch(10, 12, [
-                                        predef_esc(11, 12)
-                                    ]),
-                                    esc_ch(12, 18, [
-                                        uni4_esc(13, 18, [
-                                            hex_digit(14, 15),
-                                            hex_digit(15, 16),
-                                            hex_digit(16, 17),
-                                            hex_digit(17, 18),
-                                        ]),
+                        name(9, 19, [
+                            string(9, 19, [
+                                esc_ch(10, 12, [
+                                    predef_esc(11, 12)
+                                ]),
+                                esc_ch(12, 18, [
+                                    uni4_esc(13, 18, [
+                                        hex_digit(14, 15),
+                                        hex_digit(15, 16),
+                                        hex_digit(16, 17),
+                                        hex_digit(17, 18),
                                     ]),
                                 ]),
                             ]),

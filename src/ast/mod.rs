@@ -67,11 +67,11 @@ impl FromStr for Statement {
     }
 }
 
-/// A term, for example `foo`, `Bar`, or `baz(1, 2)`.
+/// A term, for example `foo` or `Bar`.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Term {
-    /// A literal term.
-    Literal(Literal),
+    /// A name.
+    Name(Name),
 
     /// A variable.
     Variable(Variable),

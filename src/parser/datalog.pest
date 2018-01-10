@@ -16,7 +16,7 @@ name = { ident | string }
 literal = { name ~ ("(" ~ term_list? ~ ")")? }
 literal_list = { literal ~ ("," ~ literal)* }
 
-term = { variable | literal }
+term = { variable | name }
 term_list = { term ~ ("," ~ term)* }
 
 clause = { literal ~ (":-" ~ literal_list)? }
