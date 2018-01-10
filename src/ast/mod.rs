@@ -1,6 +1,6 @@
 //! The basic Datalog AST.
 
-mod symbol;
+mod name;
 mod variable;
 
 use std::path::Path;
@@ -8,7 +8,7 @@ use std::str::FromStr;
 
 use errors::{Error, Result};
 
-pub use self::symbol::Symbol;
+pub use self::name::Name;
 pub use self::variable::Variable;
 
 /// A complete program; really just a bunch of statements.
@@ -79,7 +79,7 @@ pub enum Term {
 
 /// A literal term, for example `foo`, `bar(X)`, or `baz(quux(X, 2), X)`.
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Literal(pub Symbol, pub Vec<Term>);
+pub struct Literal(pub Name, pub Vec<Term>);
 
 /// A clause (a fact or a rule).
 ///

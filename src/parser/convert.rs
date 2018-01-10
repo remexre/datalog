@@ -4,7 +4,7 @@ use pest::Error;
 use pest::iterators::{Pair, Pairs};
 use pest::inputs::Input;
 
-use ast::{Clause, Literal, Program, Statement, Symbol, Term, Variable};
+use ast::{Clause, Literal, Name, Program, Statement, Term, Variable};
 use parser::Rule;
 use parser::utils::{as_amb, as_one, as_one_any};
 
@@ -12,6 +12,7 @@ pub fn convert_program<I: Input>(
     pairs: Pairs<Rule, I>,
 ) -> Result<Program, Error<Rule, I>> {
     as_one(pairs, Rule::program, |pairs| {
+        println!("{}", pairs);
         pairs
             .map(Pair::into_inner)
             .map(convert_statement_one)
@@ -74,8 +75,8 @@ pub fn convert_literal<I: Input>(
 pub fn convert_literal_one<I: Input>(
     pairs: Pairs<Rule, I>,
 ) -> Result<Literal, Error<Rule, I>> {
-    as_amb(pairs, Rule::symbol, Rule::term_list, |pred, args| {
-        let pred = convert_symbol_one(pred)?;
+    as_amb(pairs, Rule::name, Rule::term_list, |pred, args| {
+        let pred = convert_name_one(pred)?;
         let args = if let Some(args) = args {
             args.map(Pair::into_inner).map(convert_term_one).collect()
         } else {
@@ -109,33 +110,31 @@ pub fn convert_term_one<I: Input>(
 }
 
 #[cfg(test)]
-pub fn convert_symbol<I: Input>(
+pub fn convert_name<I: Input>(
     pairs: Pairs<Rule, I>,
-) -> Result<Symbol, Error<Rule, I>> {
-    as_one(pairs, Rule::symbol, convert_symbol_one)
+) -> Result<Name, Error<Rule, I>> {
+    as_one(pairs, Rule::name, convert_name_one)
 }
 
-pub fn convert_symbol_one<I: Input>(
+pub fn convert_name_one<I: Input>(
     pairs: Pairs<Rule, I>,
-) -> Result<Symbol, Error<Rule, I>> {
-    as_one_any(pairs, Rule::symbol, |token| {
+) -> Result<Name, Error<Rule, I>> {
+    as_one_any(pairs, Rule::name, |token| {
         match token.as_rule() {
             Rule::ident => {
                 // This should be infallible.
-                let ident = token.as_str().to_string();
-                let ident = Symbol::new(ident).unwrap();
-                Ok(ident)
+                Ok(Name::new(token.as_str()).unwrap())
             }
             Rule::string => {
                 // This might fail, since "X" is a valid string but an invalid
-                // symbol.
+                // name.
                 let string = token
                     .clone()
                     .into_inner()
                     .map(convert_char)
-                    .collect::<Result<_, _>>()?;
-                Symbol::new(string).map_err(|_| Error::ParsingError {
-                    positives: vec![Rule::symbol],
+                    .collect::<Result<String, _>>()?;
+                Name::new(&string).ok_or_else(|| Error::ParsingError {
+                    positives: vec![Rule::name],
                     negatives: vec![],
                     pos: token.into_span().start_pos(),
                 })
@@ -234,5 +233,5 @@ pub fn convert_variable<I: Input>(
 }
 
 pub fn convert_variable_one<I: Input>(token: Pair<Rule, I>) -> Variable {
-    Variable::new(token.as_str().to_string()).unwrap()
+    Variable::new(token.as_str()).unwrap()
 }

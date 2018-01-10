@@ -1,6 +1,8 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
-use {Clause, Interpeter, Result, Statement, Symbol};
+use symbol::Symbol;
+
+use {Clause, Interpeter, Literal, Result};
 
 /// A naive interpreter.
 #[derive(Debug)]
@@ -15,14 +17,23 @@ impl NaiveInterpreter {
             facts: HashMap::new(),
         }
     }
+
+    /// Attempts to solve a goal.
+    pub fn solve(&self, goal: Literal) -> Option<BTreeMap<Symbol, Literal>> {
+        unimplemented!()
+    }
 }
 
 impl Interpeter for NaiveInterpreter {
-    fn run_stmt(&mut self, stmt: Statement) -> Result<()> {
-        match stmt {
-            Statement::Assertion(clause) => unimplemented!(),
-            Statement::Retraction(clause) => unimplemented!(),
-            Statement::Query(literal) => unimplemented!(),
-        }
+    fn run_assertion(&mut self, clause: Clause) -> Result<()> {
+        unimplemented!()
+    }
+
+    fn run_retraction(&mut self, clause: Clause) -> Result<()> {
+        unimplemented!()
+    }
+
+    fn run_query(&self, query: Literal) -> Result<BTreeMap<Symbol, Literal>> {
+        unimplemented!()
     }
 }

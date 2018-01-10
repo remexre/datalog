@@ -87,7 +87,7 @@ fn literals() {
         rule: Rule::literal,
         tokens: [
             literal(0, 18, [
-                symbol(0, 18, [
+                name(0, 18, [
                     ident(0, 18),
                 ]),
             ]),
@@ -99,7 +99,7 @@ fn literals() {
         rule: Rule::literal,
         tokens: [
             literal(0, 17, [
-                symbol(0, 15, [
+                name(0, 15, [
                     ident(0, 15),
                 ]),
             ]),
@@ -111,13 +111,13 @@ fn literals() {
         rule: Rule::literal,
         tokens: [
             literal(0, 6, [
-                symbol(0, 1, [
+                name(0, 1, [
                     ident(0, 1),
                 ]),
                 term_list(2, 5, [
                     term(2, 5, [
                         literal(2, 5, [
-                            symbol(2, 5, [
+                            name(2, 5, [
                                 ident(2, 5),
                             ]),
                         ]),
@@ -132,20 +132,20 @@ fn literals() {
         rule: Rule::literal,
         tokens: [
             literal(0, 21, [
-                symbol(0, 6, [
+                name(0, 6, [
                     ident(0, 6),
                 ]),
                 term_list(7, 20, [
                     term(7, 11, [
                         literal(7, 11, [
-                            symbol(7, 11, [
+                            name(7, 11, [
                                 ident(7, 11),
                             ]),
                         ]),
                     ]),
                     term(13, 20, [
                         literal(13, 20, [
-                            symbol(13, 20, [
+                            name(13, 20, [
                                 ident(13, 20),
                             ]),
                         ]),
@@ -160,20 +160,20 @@ fn literals() {
         rule: Rule::literal,
         tokens: [
             literal(0, 20, [
-                symbol(0, 4, [
+                name(0, 4, [
                     ident(0, 4),
                 ]),
                 term_list(5, 19, [
                     term(5, 7, [
                         literal(5, 7, [
-                            symbol(5, 7, [
+                            name(5, 7, [
                                 ident(5, 7),
                             ]),
                         ]),
                     ]),
                     term(9, 19, [
                         literal(9, 19, [
-                            symbol(9, 19, [
+                            name(9, 19, [
                                 string(9, 19, [
                                     esc_ch(10, 12, [
                                         predef_esc(11, 12)

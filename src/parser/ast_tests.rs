@@ -1,6 +1,6 @@
 use pest::Parser;
 
-use ast::{Clause, Literal, Program, Statement, Symbol, Term, Variable};
+use ast::{Clause, Literal, Name, Program, Statement, Term, Variable};
 use parser::{convert, DatalogParser, Rule};
 
 macro_rules! ast_parse_test {
@@ -26,92 +26,92 @@ ast_parse_test! {
             "apple)~\nspicy(apple)?") =>
         Program(vec![
             Statement::Assertion(Clause(
-                Literal("red".into(), vec![Term::Literal(Literal("apple".into(), vec![]))]), vec![
+                Literal(Name::new("red").unwrap(), vec![Term::Literal(Literal(Name::new("apple").unwrap(), vec![]))]), vec![
                 ])),
             Statement::Assertion(Clause(
-                Literal("fruit".into(), vec![Term::Literal(Literal("apple".into(), vec![]))]), vec![
+                Literal(Name::new("fruit").unwrap(), vec![Term::Literal(Literal(Name::new("apple").unwrap(), vec![]))]), vec![
                 ])),
             Statement::Assertion(Clause(
-                Literal("spicy".into(), vec![Term::Variable("X".into())]), vec![
-                    Literal("red".into(), vec![Term::Variable("X".into())]),
-                    Literal("vegetable".into(), vec![Term::Variable("X".into())]),
+                Literal(Name::new("spicy").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())]), vec![
+                    Literal(Name::new("red").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())]),
+                    Literal(Name::new("vegetable").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())]),
                 ])),
             Statement::Query(
-                Literal("spicy".into(), vec![Term::Variable("X".into())])),
+                Literal(Name::new("spicy").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())])),
             Statement::Assertion(Clause(
-                Literal("vegetable".into(), vec![Term::Literal(Literal("apple".into(), vec![]))]), vec![
+                Literal(Name::new("vegetable").unwrap(), vec![Term::Literal(Literal(Name::new("apple").unwrap(), vec![]))]), vec![
                 ])),
             Statement::Query(
-                Literal("spicy".into(), vec![Term::Literal(Literal("apple".into(), vec![]))])),
+                Literal(Name::new("spicy").unwrap(), vec![Term::Literal(Literal(Name::new("apple").unwrap(), vec![]))])),
             Statement::Retraction(Clause(
-                Literal("vegetable".into(), vec![Term::Literal(Literal("apple".into(), vec![]))]), vec![
+                Literal(Name::new("vegetable").unwrap(), vec![Term::Literal(Literal(Name::new("apple").unwrap(), vec![]))]), vec![
                 ])),
             Statement::Query(
-                Literal("spicy".into(), vec![Term::Literal(Literal("apple".into(), vec![]))])),
+                Literal(Name::new("spicy").unwrap(), vec![Term::Literal(Literal(Name::new("apple").unwrap(), vec![]))])),
         ]);
 
     [convert_statement, stmt] as statement:
         "red(apple)." => Statement::Assertion(Clause(
-            Literal("red".into(), vec![Term::Literal(Literal("apple".into(), vec![]))]), vec![
+            Literal(Name::new("red").unwrap(), vec![Term::Literal(Literal(Name::new("apple").unwrap(), vec![]))]), vec![
             ])),
         "fruit(apple)." => Statement::Assertion(Clause(
-            Literal("fruit".into(), vec![Term::Literal(Literal("apple".into(), vec![]))]), vec![
+            Literal(Name::new("fruit").unwrap(), vec![Term::Literal(Literal(Name::new("apple").unwrap(), vec![]))]), vec![
             ])),
         "spicy(X) :-\n\tred(X),\n\tvegetable(X)." => Statement::Assertion(Clause(
-            Literal("spicy".into(), vec![Term::Variable("X".into())]), vec![
-                Literal("red".into(), vec![Term::Variable("X".into())]),
-                Literal("vegetable".into(), vec![Term::Variable("X".into())]),
+            Literal(Name::new("spicy").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())]), vec![
+                Literal(Name::new("red").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())]),
+                Literal(Name::new("vegetable").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())]),
             ])),
         "spicy(X)?" => Statement::Query(
-            Literal("spicy".into(), vec![Term::Variable("X".into())])),
+            Literal(Name::new("spicy").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())])),
         "vegetable(apple)." => Statement::Assertion(Clause(
-            Literal("vegetable".into(), vec![Term::Literal(Literal("apple".into(), vec![]))]), vec![
+            Literal(Name::new("vegetable").unwrap(), vec![Term::Literal(Literal(Name::new("apple").unwrap(), vec![]))]), vec![
             ])),
         "spicy(apple)?" => Statement::Query(
-            Literal("spicy".into(), vec![Term::Literal(Literal("apple".into(), vec![]))])),
+            Literal(Name::new("spicy").unwrap(), vec![Term::Literal(Literal(Name::new("apple").unwrap(), vec![]))])),
         "vegetable(apple)~" => Statement::Retraction(Clause(
-            Literal("vegetable".into(), vec![Term::Literal(Literal("apple".into(), vec![]))]), vec![
+            Literal(Name::new("vegetable").unwrap(), vec![Term::Literal(Literal(Name::new("apple").unwrap(), vec![]))]), vec![
             ]));
 
     [convert_clause, clause] as clause:
-        "red(apple)" => Clause(Literal(Symbol::from("red"), vec![
-            Term::Literal(Literal(Symbol::from("apple"), vec![])),
+        "red(apple)" => Clause(Literal(Name::new("red").unwrap(), vec![
+            Term::Literal(Literal(Name::new("apple").unwrap(), vec![])),
         ]), vec![]),
-        "fruit(apple)" => Clause(Literal(Symbol::from("fruit"), vec![
-            Term::Literal(Literal(Symbol::from("apple"), vec![])),
+        "fruit(apple)" => Clause(Literal(Name::new("fruit").unwrap(), vec![
+            Term::Literal(Literal(Name::new("apple").unwrap(), vec![])),
         ]), vec![]),
         "spicy(X) :-\n\tred(X),\n\tvegetable(X)" =>
-            Clause(Literal(Symbol::from("spicy"), vec![ Term::Variable(Variable::from("X")) ]), vec![
-                Literal(Symbol::from("red"), vec![ Term::Variable(Variable::from("X")) ]),
-                Literal(Symbol::from("vegetable"), vec![ Term::Variable(Variable::from("X")) ]),
+            Clause(Literal(Name::new("spicy").unwrap(), vec![ Term::Variable(Variable::new("X").unwrap()) ]), vec![
+                Literal(Name::new("red").unwrap(), vec![ Term::Variable(Variable::new("X").unwrap()) ]),
+                Literal(Name::new("vegetable").unwrap(), vec![ Term::Variable(Variable::new("X").unwrap()) ]),
             ]);
 
     [convert_literal, literal] as literal:
-        "foo" => Literal(Symbol::from("foo"), vec![]),
-        "bar(X)" => Literal(Symbol::from("bar"), vec![Term::Variable(Variable::from("X"))]),
-        "baz(quux(X, 2), X)" => Literal(Symbol::from("baz"), vec![
-            Term::Literal(Literal(Symbol::from("quux"), vec![
-                Term::Variable(Variable::from("X")),
-                Term::Literal(Literal(Symbol::from("2"), vec![])),
+        "foo" => Literal(Name::new("foo").unwrap(), vec![]),
+        "bar(X)" => Literal(Name::new("bar").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())]),
+        "baz(quux(X, 2), X)" => Literal(Name::new("baz").unwrap(), vec![
+            Term::Literal(Literal(Name::new("quux").unwrap(), vec![
+                Term::Variable(Variable::new("X").unwrap()),
+                Term::Literal(Literal(Name::new("2").unwrap(), vec![])),
             ])),
-            Term::Variable(Variable::from("X")),
+            Term::Variable(Variable::new("X").unwrap()),
         ]);
 
     [convert_term, term] as term:
-        "foo" => Term::Literal(Literal(Symbol::from("foo"), vec![])),
-        "Bar" => Term::Variable(Variable::from("Bar")),
-        "baz(1, 2)" => Term::Literal(Literal(Symbol::from("baz"), vec![
-            Term::Literal(Literal(Symbol::from("1"), vec![])),
-            Term::Literal(Literal(Symbol::from("2"), vec![])),
+        "foo" => Term::Literal(Literal(Name::new("foo").unwrap(), vec![])),
+        "Bar" => Term::Variable(Variable::new("Bar").unwrap()),
+        "baz(1, 2)" => Term::Literal(Literal(Name::new("baz").unwrap(), vec![
+            Term::Literal(Literal(Name::new("1").unwrap(), vec![])),
+            Term::Literal(Literal(Name::new("2").unwrap(), vec![])),
         ]));
 
-    [convert_symbol, symbol] as symbol:
-        "foo" => Symbol::from("foo"),
-        "42" => Symbol::from("42"),
-        r#""qwerty\nasdf\n\u03bb""# => Symbol::from("qwerty\nasdf\n\u{3bb}");
+    [convert_name, name] as name:
+        "foo" => Name::new("foo").unwrap(),
+        "42" => Name::new("42").unwrap(),
+        r#""qwerty\nasdf\n\u03bb""# => Name::new("qwerty\nasdf\n\u{3bb}").unwrap();
 
     [convert_variable, variable] as variable:
-        "X" => Variable::from("X"),
-        "Foo" => Variable::from("Foo"),
-        "A123" => Variable::from("A123");
+        "X" => Variable::new("X").unwrap(),
+        "Foo" => Variable::new("Foo").unwrap(),
+        "A123" => Variable::new("A123").unwrap();
 }

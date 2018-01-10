@@ -9,7 +9,7 @@ use std::process::exit;
 
 use clap::ArgMatches;
 use datalog::{DynamicInterpreter, Interpeter, NaiveInterpreter, Program,
-              Result, Statement};
+              Result};
 use error_chain::ChainedError;
 use liner::Context;
 

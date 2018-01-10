@@ -7,25 +7,57 @@ extern crate error_chain;
 extern crate pest;
 #[macro_use]
 extern crate pest_derive;
+extern crate symbol;
 
 mod ast;
 mod errors;
 mod naive;
 pub(crate) mod parser;
 
-pub use ast::{Clause, Literal, Program, Statement, Symbol, Term, Variable};
+use std::collections::BTreeMap;
+
+use symbol::Symbol;
+
+pub use ast::{Clause, Literal, Name, Program, Statement, Term, Variable};
 pub use errors::{Error, ErrorKind, Result, ResultExt};
 pub use naive::NaiveInterpreter;
 
 /// A Datalog interpreter.
 pub trait Interpeter {
-    /// Runs a single statement.
-    fn run_stmt(&mut self, stmt: Statement) -> Result<()>;
+    /// Adds an assertion to the fact set.
+    fn run_assertion(&mut self, clause: Clause) -> Result<()>;
+
+    /// Retracts an assertion from the fact set.
+    fn run_retraction(&mut self, clause: Clause) -> Result<()>;
+
+    /// Runs a query against the fact set. Returns the variable bindings that
+    /// make it true, or `None` if the query is unprovable.
+    fn run_query(&self, query: Literal) -> Result<BTreeMap<Symbol, Literal>>;
+
+    /// Runs a statement.
+    fn run_stmt(
+        &mut self,
+        stmt: Statement,
+    ) -> Result<BTreeMap<Symbol, Literal>> {
+        match stmt {
+            Statement::Assertion(clause) => {
+                self.run_assertion(clause).map(|()| BTreeMap::default())
+            }
+            Statement::Retraction(clause) => {
+                self.run_retraction(clause).map(|()| BTreeMap::default())
+            }
+            Statement::Query(query) => self.run_query(query),
+        }
+    }
 
     /// Loads a program into the interpreter.
     fn load_program(&mut self, program: Program) -> Result<()> {
         for stmt in program.0 {
-            self.run_stmt(stmt)?;
+            match stmt {
+                Statement::Assertion(clause) => self.run_assertion(clause)?,
+                Statement::Retraction(clause) => self.run_retraction(clause)?,
+                Statement::Query(_) => {}
+            }
         }
         Ok(())
     }
@@ -45,7 +77,28 @@ impl From<NaiveInterpreter> for DynamicInterpreter {
 }
 
 impl Interpeter for DynamicInterpreter {
-    fn run_stmt(&mut self, stmt: Statement) -> Result<()> {
+    fn run_assertion(&mut self, clause: Clause) -> Result<()> {
+        match *self {
+            DynamicInterpreter::Naive(ref mut i) => i.run_assertion(clause),
+        }
+    }
+
+    fn run_retraction(&mut self, clause: Clause) -> Result<()> {
+        match *self {
+            DynamicInterpreter::Naive(ref mut i) => i.run_retraction(clause),
+        }
+    }
+
+    fn run_query(&self, query: Literal) -> Result<BTreeMap<Symbol, Literal>> {
+        match *self {
+            DynamicInterpreter::Naive(ref i) => i.run_query(query),
+        }
+    }
+
+    fn run_stmt(
+        &mut self,
+        stmt: Statement,
+    ) -> Result<BTreeMap<Symbol, Literal>> {
         match *self {
             DynamicInterpreter::Naive(ref mut i) => i.run_stmt(stmt),
         }

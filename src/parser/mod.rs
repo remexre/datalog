@@ -39,7 +39,7 @@ impl Display for Rule {
             Rule::predef_esc => fmt.write_str("predefined escape"),
             Rule::esc_ch => fmt.write_str("escape character"),
             Rule::string => fmt.write_str("string"),
-            Rule::symbol => fmt.write_str("symbol"),
+            Rule::name => fmt.write_str("name"),
             Rule::literal => fmt.write_str("literal"),
             Rule::literal_list => fmt.write_str("list of literals"),
             Rule::term => fmt.write_str("term"),

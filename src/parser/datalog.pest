@@ -11,9 +11,9 @@ predef_esc = { "n" | "r" | "t" | "\\" | "\"" | "'" }
 esc_ch = { "\\" ~ (hex_esc | uni4_esc | uni8_esc | predef_esc) }
 string = ${ "\"" ~ (raw_ch | esc_ch)* ~ "\"" }
 
-symbol = { ident | string }
+name = { ident | string }
 
-literal = { symbol ~ ("(" ~ term_list? ~ ")")? }
+literal = { name ~ ("(" ~ term_list? ~ ")")? }
 literal_list = { literal ~ ("," ~ literal)* }
 
 term = { variable | literal }
