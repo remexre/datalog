@@ -12,7 +12,6 @@ pub fn convert_program<I: Input>(
     pairs: Pairs<Rule, I>,
 ) -> Result<Program, Error<Rule, I>> {
     as_one(pairs, Rule::program, |pairs| {
-        println!("{}", pairs);
         pairs
             .map(Pair::into_inner)
             .map(convert_statement_one)

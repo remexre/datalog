@@ -6,10 +6,4 @@ edge(b, d).
 % This is an undirected graph.
 edge(X, Y) :- edge(Y, X).
 
-% TODO: List notation
-path(X, X, cons(X, nil)).
-path(X, Y, cons(X, Tail)) :-
-	edge(X, Z),
-	path(Z, Y, Tail).
-
 path(a, d)?

@@ -1,0 +1,8 @@
+red(apple).
+fruit(apple).
+spicy(X) :- red(X), vegetable(X).
+spicy(X)?
+vegetable(apple).
+spicy(apple)?
+vegetable(apple)~
+spicy(apple)?

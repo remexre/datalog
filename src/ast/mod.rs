@@ -1,6 +1,7 @@
 //! The basic Datalog AST.
 
 mod name;
+mod print;
 mod variable;
 
 use std::path::Path;
@@ -67,20 +68,6 @@ impl FromStr for Statement {
     }
 }
 
-/// A term, for example `foo` or `Bar`.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub enum Term {
-    /// A name.
-    Name(Name),
-
-    /// A variable.
-    Variable(Variable),
-}
-
-/// A literal term, for example `foo`, `bar(X)`, or `baz(quux(X, 2), X)`.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Literal(pub Name, pub Vec<Term>);
-
 /// A clause (a fact or a rule).
 ///
 /// For example, the following are all clauses:
@@ -100,3 +87,17 @@ pub struct Literal(pub Name, pub Vec<Term>);
 /// which are statements.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Clause(pub Literal, pub Vec<Literal>);
+
+/// A literal term, for example `foo`, `bar(X)`, or `baz(quux(X, 2), X)`.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Literal(pub Name, pub Vec<Term>);
+
+/// A term, for example `foo` or `Bar`.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum Term {
+    /// A name.
+    Name(Name),
+
+    /// A variable.
+    Variable(Variable),
+}
