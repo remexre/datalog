@@ -62,7 +62,7 @@ fn pretty(matches: &ArgMatches) -> Result<()> {
         Program::parse_file(file)?
     };
 
-    program.to_doc().write_to_tty().map_err(|e| e.into())
+    program.to_doc().writeln_to_tty().map_err(|e| e.into())
 }
 
 fn run(matches: &ArgMatches) -> Result<()> {

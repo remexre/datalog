@@ -31,4 +31,4 @@ stmt_all = { soi ~ stmt* ~ eoi }
 
 whitespace = _{ " " | "\t" | line_break }
 line_break = _{ "\n" | "\r" }
-comment = { "%" ~ (!line_break ~ any)* ~ line_break }
+comment = _{ "%" ~ (!line_break ~ any)* ~ line_break }

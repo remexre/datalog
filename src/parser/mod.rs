@@ -63,19 +63,19 @@ pub fn parse_program_file<P: AsRef<Path>>(path: P) -> Result<Program> {
     let input = FileInput::new(path)?;
     DatalogParser::parse(Rule::program, Rc::new(input))
         .and_then(convert_program)
-        .map_err(|_err| unimplemented!()) // TODO
+        .map_err(|_err| unimplemented!("Convert parse error")) // TODO
 }
 
 /// Parses a program from the given string.
 pub fn parse_program_string(src: &str) -> Result<Program> {
     DatalogParser::parse_str(Rule::program, src)
         .and_then(convert_program)
-        .map_err(|_err| unimplemented!()) // TODO
+        .map_err(|_err| unimplemented!("Convert parse error")) // TODO
 }
 
 /// Parses a statement from the given string.
 pub fn parse_stmt(src: &str) -> Result<Statement> {
     DatalogParser::parse_str(Rule::stmt, src)
         .and_then(convert_statement)
-        .map_err(|_err| unimplemented!()) // TODO
+        .map_err(|_err| unimplemented!("Convert parse error")) // TODO
 }

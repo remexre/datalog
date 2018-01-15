@@ -16,9 +16,9 @@ const NAME: Style = Style {
     is_strikethrough: false,
 };
 const PUNCTUATION: Style = Style {
-    foreground: None,
+    foreground: Some(Colour::Purple),
     background: None,
-    is_bold: true,
+    is_bold: false,
     is_dimmed: false,
     is_italic: false,
     is_underline: false,
@@ -28,12 +28,12 @@ const PUNCTUATION: Style = Style {
     is_strikethrough: false,
 };
 const VARIABLE: Style = Style {
-    foreground: Some(Colour::Green),
+    foreground: Some(Colour::Red),
     background: None,
-    is_bold: false,
+    is_bold: true,
     is_dimmed: false,
     is_italic: false,
-    is_underline: true,
+    is_underline: false,
     is_blink: false,
     is_reverse: false,
     is_hidden: false,
@@ -69,11 +69,13 @@ impl Sparkly for Clause {
             head.to_doc()
         } else {
             let body = Doc::from(",")
-                .join(body.iter().map(|l| Doc::line_or(" ").append(l.to_doc())))
+                .style(PUNCTUATION)
+                .join(body.iter().map(|l| Doc::space().append(l.to_doc())))
                 .nest(4)
                 .group();
             head.to_doc()
-                .nbsp(Doc::from(":-").style(PUNCTUATION))
+                .append(Doc::nbsp())
+                .append(Doc::from(":-").style(PUNCTUATION))
                 .append(body)
         }
     }
@@ -82,7 +84,7 @@ impl Sparkly for Clause {
 impl Sparkly for Literal {
     fn to_doc(&self) -> Doc {
         let Literal(ref pred, ref args) = *self;
-        let args = Doc::from(",").append(Doc::line_or(" ")).join(args);
+        let args = Doc::from(",").append(Doc::space()).join(args);
         pred.to_doc().append(args.bracket("(", ")"))
     }
 }

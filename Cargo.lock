@@ -78,7 +78,7 @@ dependencies = [
  "pest 1.0.0-beta.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "pest_derive 1.0.0-beta.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "pretty 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "sparkly 0.1.0",
+ "sparkly 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "symbol 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -171,7 +171,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "sparkly"
-version = "0.1.0"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "ansi_term 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "itertools 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -286,6 +287,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum redox_syscall 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)" = "0d92eecebad22b767915e4d529f89f28ee96dbbf5a4810d2b844373f136417fd"
 "checksum redox_termios 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "7e891cfe48e9100a70a3b6eb652fef28920c117d366339687bd5576160db0f76"
 "checksum rustc-demangle 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "aee45432acc62f7b9a108cc054142dac51f979e69e71ddce7d6fc7adf29e817e"
+"checksum sparkly 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "ffc5931233912907714f950f1ba152900f22d52d67ed1724347893e4d74f0807"
 "checksum spin 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)" = "7e4deb3c2455c73779e6d3eebceae9599fc70957e54c69fe88f93aa48e62f432"
 "checksum strsim 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)" = "b4d15c810519a91cf877e7e36e63fe068815c678181439f2f29e2562147c3694"
 "checksum symbol 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "25730cc64cd40dc7c958cfd8e7794b8dc61a16fba0b956428bfc74f848a60f14"

@@ -10,9 +10,5 @@ liner = "0.4.4"
 pest = "1.0.0-beta"
 pest_derive = "1.0.0-beta"
 pretty = "0.3.3"
+sparkly = { version = "0.1.2", features = ["termion"] }
 symbol = "0.1.0"
-
-[dependencies.sparkly]
-features = ["termion"]
-path = "../sparkly-rs"
-version = "0.1.0"
