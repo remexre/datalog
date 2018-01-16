@@ -1,9 +1,18 @@
 edge(a, b).
-edge(b, c).
 edge(a, c).
+edge(b, c).
 edge(b, d).
+edge(e, f).
+edge(f, g).
+edge(f, h).
+edge(g, h).
 
-% This is an undirected graph.
+% Nodes connect to themselves.
+edge(X, X).
+
+% This is an undirected graph; remove this rule to change this.
 edge(X, Y) :- edge(Y, X).
 
-path(a, d)?
+path(X, Y) :-
+	edge(X, Z),
+	path(Z, Y).

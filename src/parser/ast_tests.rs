@@ -32,12 +32,12 @@ ast_parse_test! {
                 Literal(Name::new("fruit").unwrap(), vec![Term::Name(Name::new("apple").unwrap())]), vec![
                 ])),
             Statement::Assertion(Clause(
-                Literal(Name::new("spicy").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())]), vec![
-                    Literal(Name::new("red").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())]),
-                    Literal(Name::new("vegetable").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())]),
+                Literal(Name::new("spicy").unwrap(), vec![Term::Var(Variable::new("X").unwrap())]), vec![
+                    Literal(Name::new("red").unwrap(), vec![Term::Var(Variable::new("X").unwrap())]),
+                    Literal(Name::new("vegetable").unwrap(), vec![Term::Var(Variable::new("X").unwrap())]),
                 ])),
             Statement::Query(
-                Literal(Name::new("spicy").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())])),
+                Literal(Name::new("spicy").unwrap(), vec![Term::Var(Variable::new("X").unwrap())])),
             Statement::Assertion(Clause(
                 Literal(Name::new("vegetable").unwrap(), vec![Term::Name(Name::new("apple").unwrap())]), vec![
                 ])),
@@ -58,12 +58,12 @@ ast_parse_test! {
             Literal(Name::new("fruit").unwrap(), vec![Term::Name(Name::new("apple").unwrap())]), vec![
             ])),
         "spicy(X) :-\n\tred(X),\n\tvegetable(X)." => Statement::Assertion(Clause(
-            Literal(Name::new("spicy").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())]), vec![
-                Literal(Name::new("red").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())]),
-                Literal(Name::new("vegetable").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())]),
+            Literal(Name::new("spicy").unwrap(), vec![Term::Var(Variable::new("X").unwrap())]), vec![
+                Literal(Name::new("red").unwrap(), vec![Term::Var(Variable::new("X").unwrap())]),
+                Literal(Name::new("vegetable").unwrap(), vec![Term::Var(Variable::new("X").unwrap())]),
             ])),
         "spicy(X)?" => Statement::Query(
-            Literal(Name::new("spicy").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())])),
+            Literal(Name::new("spicy").unwrap(), vec![Term::Var(Variable::new("X").unwrap())])),
         "vegetable(apple)." => Statement::Assertion(Clause(
             Literal(Name::new("vegetable").unwrap(), vec![Term::Name(Name::new("apple").unwrap())]), vec![
             ])),
@@ -81,18 +81,18 @@ ast_parse_test! {
             Term::Name(Name::new("apple").unwrap()),
         ]), vec![]),
         "spicy(X) :-\n\tred(X),\n\tvegetable(X)" =>
-            Clause(Literal(Name::new("spicy").unwrap(), vec![ Term::Variable(Variable::new("X").unwrap()) ]), vec![
-                Literal(Name::new("red").unwrap(), vec![ Term::Variable(Variable::new("X").unwrap()) ]),
-                Literal(Name::new("vegetable").unwrap(), vec![ Term::Variable(Variable::new("X").unwrap()) ]),
+            Clause(Literal(Name::new("spicy").unwrap(), vec![ Term::Var(Variable::new("X").unwrap()) ]), vec![
+                Literal(Name::new("red").unwrap(), vec![ Term::Var(Variable::new("X").unwrap()) ]),
+                Literal(Name::new("vegetable").unwrap(), vec![ Term::Var(Variable::new("X").unwrap()) ]),
             ]);
 
     [convert_literal, literal] as literal:
         "foo" => Literal(Name::new("foo").unwrap(), vec![]),
-        "bar(X)" => Literal(Name::new("bar").unwrap(), vec![Term::Variable(Variable::new("X").unwrap())]);
+        "bar(X)" => Literal(Name::new("bar").unwrap(), vec![Term::Var(Variable::new("X").unwrap())]);
 
     [convert_term, term] as term:
         "foo" => Term::Name(Name::new("foo").unwrap()),
-        "Bar" => Term::Variable(Variable::new("Bar").unwrap());
+        "Bar" => Term::Var(Variable::new("Bar").unwrap());
 
     [convert_name, name] as name:
         "foo" => Name::new("foo").unwrap(),

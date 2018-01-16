@@ -1,5 +1,8 @@
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
+#[cfg(test)]
+use regex::Regex;
+
 use symbol::Symbol;
 
 /// A name, for example `foo`, `42`, or `"qwerty\nasdf\n\u03bb"`.
@@ -37,13 +40,29 @@ impl Display for Name {
         fn is_ident_char(ch: char) -> bool {
             ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z')
                 || ('0' <= ch && ch <= '9') || ch == '_'
-                || ch == '-'
         }
 
         if self.0.chars().all(is_ident_char) {
             fmt.write_str(&self.0)
         } else {
             unimplemented!("Print name {:?} in string syntax", self.0)
+        }
+    }
+}
+
+#[cfg(test)]
+lazy_static!{
+    static ref NAME_REGEX: Regex = Regex::new("^[^A-Z_].*$").unwrap();
+}
+
+#[cfg(test)]
+proptest! {
+    #[test]
+    fn name_new(ref s in ".*") {
+        if NAME_REGEX.is_match(s) {
+            prop_assert!(Name::new(s).is_some());
+        } else {
+            prop_assert_eq!(Name::new(s), None);
         }
     }
 }

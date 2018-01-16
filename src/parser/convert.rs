@@ -97,7 +97,7 @@ pub fn convert_term_one<I: Input>(
 ) -> Result<Term, Error<Rule, I>> {
     as_one_any(pairs, Rule::term, |token| match token.as_rule() {
         Rule::name => convert_name_one(token.into_inner()).map(Term::Name),
-        Rule::variable => Ok(Term::Variable(convert_variable_one(token))),
+        Rule::variable => Ok(Term::Var(convert_variable_one(token))),
         _ => Err(Error::ParsingError {
             positives: vec![Rule::name, Rule::variable],
             negatives: vec![],
@@ -130,10 +130,12 @@ pub fn convert_name_one<I: Input>(
                     .into_inner()
                     .map(convert_char)
                     .collect::<Result<String, _>>()?;
-                Name::new(&string).ok_or_else(|| Error::ParsingError {
-                    positives: vec![Rule::name],
-                    negatives: vec![],
-                    pos: token.into_span().start_pos(),
+                Name::new(&string).ok_or_else(|| {
+                    Error::ParsingError {
+                        positives: vec![Rule::name],
+                        negatives: vec![],
+                        pos: token.into_span().start_pos(),
+                    }
                 })
             }
             _ => Err(Error::ParsingError {
@@ -224,9 +226,11 @@ pub fn convert_escape<I: Input>(
 pub fn convert_variable<I: Input>(
     pairs: Pairs<Rule, I>,
 ) -> Result<Variable, Error<Rule, I>> {
-    as_one_any(pairs, Rule::variable, |token| {
-        Ok(convert_variable_one(token))
-    })
+    as_one_any(
+        pairs,
+        Rule::variable,
+        |token| Ok(convert_variable_one(token)),
+    )
 }
 
 pub fn convert_variable_one<I: Input>(token: Pair<Rule, I>) -> Variable {

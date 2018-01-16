@@ -9,11 +9,12 @@ use std::io::ErrorKind as IoErrorKind;
 use std::process::exit;
 
 use clap::ArgMatches;
-use datalog::{DynamicInterpreter, Interpeter, NaiveInterpreter, Program,
-              Result};
+use datalog::{DynamicInterpreter, ErrorKind, Interpeter, NaiveInterpreter,
+              Program, Result, Statement};
+use datalog::styles::{ERROR, PUNCTUATION};
 use error_chain::ChainedError;
 use liner::Context;
-use sparkly::Sparkly;
+use sparkly::{Doc, Sparkly};
 
 fn main() {
     let matches = clap_app!((crate_name!()) =>
@@ -82,31 +83,63 @@ fn run(matches: &ArgMatches) -> Result<()> {
 
     if let Some(stmts) = matches.values_of("STMTS") {
         for stmt in stmts {
-            let stmt = stmt.parse()?;
-            interpreter.run_stmt(stmt)?;
+            let stmt: Statement = stmt.parse()?;
+            Doc::text("?-", PUNCTUATION)
+                .append(Doc::space())
+                .append(stmt.to_doc())
+                .writeln_to_tty()?;
+            run_stmt(&mut interpreter, stmt)?;
         }
         Ok(())
     } else {
-        run_repl(interpreter)
+        let mut ctx = Context::new();
+        let r = loop {
+            if let Err(err) = run_repl(&mut interpreter, &mut ctx) {
+                match err.kind() {
+                    &ErrorKind::Io(ref err) => match err.kind() {
+                        IoErrorKind::UnexpectedEof => break Ok(()),
+                        IoErrorKind::Interrupted => continue,
+                        _ => {}
+                    },
+                    _ => {}
+                }
+                break Err(err);
+            }
+        };
+        ctx.history.commit_history();
+        r
     }
 }
 
-fn run_repl(interpreter: DynamicInterpreter) -> Result<()> {
-    let mut con = Context::new();
+fn run_repl(
+    interpreter: &mut DynamicInterpreter,
+    ctx: &mut Context,
+) -> Result<()> {
+    let line = ctx.read_line("?- ", &mut |_| {})?;
 
-    loop {
-        match con.read_line("?- ", &mut |_| {}) {
-            Ok(line) => {
-                con.history.push(line.into())?;
-            }
-            Err(err) => match err.kind() {
-                IoErrorKind::Interrupted => continue,
-                IoErrorKind::UnexpectedEof => break,
-                _ => return Err(err.into()),
-            },
-        }
+    let stmt = line.parse()?;
+    run_stmt(interpreter, stmt)?;
+
+    ctx.history.push(line.into()).map_err(|err| err.into())
+}
+
+fn run_stmt(
+    interpreter: &mut DynamicInterpreter,
+    stmt: Statement,
+) -> Result<()> {
+    for binding in interpreter.run_stmt(stmt)? {
+        Doc::text(",", PUNCTUATION)
+            .append(Doc::space())
+            .join(binding.iter().map(|(v, n)| {
+                v.to_doc()
+                    .append(Doc::nbsp())
+                    .append(Doc::text("=", PUNCTUATION))
+                    .append(Doc::nbsp())
+                    .append(n.to_doc())
+            }))
+            .append(Doc::text(";", PUNCTUATION))
+            .writeln_to_tty()?;
     }
-
-    con.history.commit_history();
+    Doc::text("false.", ERROR).writeln_to_tty()?;
     Ok(())
 }

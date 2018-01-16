@@ -1,86 +1,52 @@
-use sparkly::{Colour, Doc, Sparkly, Style};
+use sparkly::{Doc, Sparkly};
 
 use ast::{Clause, Literal, Name, Program, Statement, Term, Variable};
+use styles::{NAME, PUNCTUATION, VARIABLE};
 
-// TODO: Use const fns, once they're stable.
-const NAME: Style = Style {
-    foreground: Some(Colour::Cyan),
-    background: None,
-    is_bold: false,
-    is_dimmed: false,
-    is_italic: false,
-    is_underline: false,
-    is_blink: false,
-    is_reverse: false,
-    is_hidden: false,
-    is_strikethrough: false,
-};
-const PUNCTUATION: Style = Style {
-    foreground: Some(Colour::Purple),
-    background: None,
-    is_bold: false,
-    is_dimmed: false,
-    is_italic: false,
-    is_underline: false,
-    is_blink: false,
-    is_reverse: false,
-    is_hidden: false,
-    is_strikethrough: false,
-};
-const VARIABLE: Style = Style {
-    foreground: Some(Colour::Red),
-    background: None,
-    is_bold: true,
-    is_dimmed: false,
-    is_italic: false,
-    is_underline: false,
-    is_blink: false,
-    is_reverse: false,
-    is_hidden: false,
-    is_strikethrough: false,
-};
-
+impl_Display_for_Sparkly!(Program);
 impl Sparkly for Program {
     fn to_doc(&self) -> Doc {
         Doc::lines(self.0.iter())
     }
 }
 
+impl_Display_for_Sparkly!(Statement);
 impl Sparkly for Statement {
     fn to_doc(&self) -> Doc {
         match *self {
             Statement::Assertion(ref c) => {
-                c.to_doc().append(Doc::from(".").style(PUNCTUATION))
+                c.to_doc().append(Doc::text(".", PUNCTUATION))
             }
             Statement::Retraction(ref c) => {
-                c.to_doc().append(Doc::from("~").style(PUNCTUATION))
+                c.to_doc().append(Doc::text("~", PUNCTUATION))
             }
             Statement::Query(ref q) => {
-                q.to_doc().append(Doc::from("?").style(PUNCTUATION))
+                q.to_doc().append(Doc::text("?", PUNCTUATION))
             }
         }
     }
 }
 
+impl_Display_for_Sparkly!(Clause);
 impl Sparkly for Clause {
     fn to_doc(&self) -> Doc {
         let Clause(ref head, ref body) = *self;
         if body.len() == 0 {
             head.to_doc()
         } else {
-            let body = Doc::from(",")
-                .style(PUNCTUATION)
+            let body = Doc::text(",", PUNCTUATION)
                 .join(body.iter().map(|l| Doc::space().append(l.to_doc())))
                 .nest(4)
                 .group();
             head.to_doc()
                 .append(Doc::nbsp())
-                .append(Doc::from(":-").style(PUNCTUATION))
+                .append(Doc::text(":-", PUNCTUATION))
                 .append(body)
         }
     }
 }
 
+impl_Display_for_Sparkly!(Literal);
 impl Sparkly for Literal {
     fn to_doc(&self) -> Doc {
         let Literal(ref pred, ref args) = *self;
@@ -89,11 +55,12 @@ impl Sparkly for Literal {
     }
 }
 
+impl_Display_for_Sparkly!(Term);
 impl Sparkly for Term {
     fn to_doc(&self) -> Doc {
         match *self {
             Term::Name(ref n) => n.to_doc(),
-            Term::Variable(ref v) => v.to_doc(),
+            Term::Var(ref v) => v.to_doc(),
         }
     }
 }

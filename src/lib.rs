@@ -7,21 +7,37 @@ extern crate error_chain;
 extern crate pest;
 #[macro_use]
 extern crate pest_derive;
+#[macro_use]
 extern crate sparkly;
 extern crate symbol;
+
+#[cfg(test)]
+#[macro_use]
+extern crate lazy_static;
+#[cfg(test)]
+#[macro_use]
+extern crate proptest;
+#[cfg(test)]
+extern crate regex;
 
 mod ast;
 mod errors;
 mod naive;
 pub(crate) mod parser;
+mod util;
 
 use std::collections::BTreeMap;
+use std::iter::empty;
 
-use symbol::Symbol;
+use sparkly::Sparkly;
 
-pub use ast::{Clause, Literal, Name, Program, Statement, Term, Variable};
+pub use ast::{styles, Clause, Literal, Name, Program, Statement, Term,
+              Variable};
 pub use errors::{Error, ErrorKind, Result, ResultExt};
 pub use naive::NaiveInterpreter;
+
+/// Bindings from variable names to values.
+pub type Bindings = BTreeMap<Variable, Name>;
 
 /// A Datalog interpreter.
 pub trait Interpeter {
@@ -31,23 +47,28 @@ pub trait Interpeter {
     /// Retracts an assertion from the fact set.
     fn run_retraction(&mut self, clause: Clause) -> Result<()>;
 
-    /// Runs a query against the fact set. Returns the variable bindings that
-    /// make it true, or `None` if the query is unprovable.
-    fn run_query(&self, query: Literal) -> Result<BTreeMap<Symbol, Literal>>;
+    /// Runs a query against the fact set. Returns an iterator over variable
+    /// bindings that make it true.
+    fn run_query<'a>(
+        &'a self,
+        query: Literal,
+    ) -> Box<'a + Iterator<Item = Bindings>>;
 
     /// Runs a statement.
-    fn run_stmt(
-        &mut self,
+    fn run_stmt<'a>(
+        &'a mut self,
         stmt: Statement,
-    ) -> Result<BTreeMap<Symbol, Literal>> {
+    ) -> Result<Box<'a + Iterator<Item = Bindings>>> {
         match stmt {
             Statement::Assertion(clause) => {
-                self.run_assertion(clause).map(|()| BTreeMap::default())
+                self.run_assertion(clause)?;
+                Ok(Box::new(empty()))
             }
             Statement::Retraction(clause) => {
-                self.run_retraction(clause).map(|()| BTreeMap::default())
+                self.run_retraction(clause)?;
+                Ok(Box::new(empty()))
             }
-            Statement::Query(query) => self.run_query(query),
+            Statement::Query(query) => Ok(self.run_query(query)),
         }
     }
 
@@ -57,7 +78,9 @@ pub trait Interpeter {
             match stmt {
                 Statement::Assertion(clause) => self.run_assertion(clause)?,
                 Statement::Retraction(clause) => self.run_retraction(clause)?,
-                Statement::Query(_) => {}
+                Statement::Query(q) => {
+                    unimplemented!("run query on load {}", q.to_doc().display())
+                }
             }
         }
         Ok(())
@@ -68,6 +91,7 @@ pub trait Interpeter {
 /// lowers dynamic dispatch overhead somewhat.
 #[derive(Debug)]
 pub enum DynamicInterpreter {
+    /// A naive interpreter.
     Naive(NaiveInterpreter),
 }
 
@@ -90,16 +114,19 @@ impl Interpeter for DynamicInterpreter {
         }
     }
 
-    fn run_query(&self, query: Literal) -> Result<BTreeMap<Symbol, Literal>> {
+    fn run_query<'a>(
+        &'a self,
+        query: Literal,
+    ) -> Box<'a + Iterator<Item = Bindings>> {
         match *self {
             DynamicInterpreter::Naive(ref i) => i.run_query(query),
         }
     }
 
-    fn run_stmt(
-        &mut self,
+    fn run_stmt<'a>(
+        &'a mut self,
         stmt: Statement,
-    ) -> Result<BTreeMap<Symbol, Literal>> {
+    ) -> Result<Box<'a + Iterator<Item = Bindings>>> {
         match *self {
             DynamicInterpreter::Naive(ref mut i) => i.run_stmt(stmt),
         }

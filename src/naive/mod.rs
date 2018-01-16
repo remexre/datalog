@@ -1,13 +1,15 @@
 use std::collections::{BTreeMap, HashMap};
+use std::iter::empty;
 
-use symbol::Symbol;
-
-use {Clause, Interpeter, Literal, Result};
+use {Clause, Interpeter, Literal, Name, Result, Variable};
 
 /// A naive interpreter.
+// An interpreter based on the one in [the first edition of Modern Compiler
+// Design](https://dickgrune.com/Books/MCD_1st_Edition/), page 601.
 #[derive(Debug)]
 pub struct NaiveInterpreter {
-    facts: HashMap<Symbol, Clause>,
+    facts: HashMap<(Name, usize), Vec<Vec<Name>>>,
+    rules: HashMap<(Name, usize), Vec<Clause>>,
 }
 
 impl NaiveInterpreter {
@@ -15,25 +17,103 @@ impl NaiveInterpreter {
     pub fn new() -> NaiveInterpreter {
         NaiveInterpreter {
             facts: HashMap::new(),
+            rules: HashMap::new(),
         }
     }
 
     /// Attempts to solve a goal.
-    pub fn solve(&self, goal: Literal) -> Option<BTreeMap<Symbol, Literal>> {
-        unimplemented!()
+    pub fn solve<'a>(
+        &'a self,
+        goal: Literal,
+    ) -> Box<'a + Iterator<Item = BTreeMap<Variable, Name>>> {
+        Box::new(self.solve_facts(goal.clone()).chain(self.solve_rules(goal)))
+    }
+
+    /// Attempts to solve a goal, only using facts.
+    pub fn solve_facts<'a>(
+        &'a self,
+        goal: Literal,
+    ) -> Box<'a + Iterator<Item = BTreeMap<Variable, Name>>> {
+        if let Some(facts) = self.facts.get(&goal.signature()) {
+            Box::new(
+                facts
+                    .iter()
+                    .filter_map(move |fact| goal.try_instantiate_fact(fact)),
+            )
+        } else {
+            Box::new(empty())
+        }
+    }
+
+    /// Attempts to solve a goal, without using facts about the goal.
+    pub fn solve_rules<'a>(
+        &'a self,
+        goal: Literal,
+    ) -> Box<'a + Iterator<Item = BTreeMap<Variable, Name>>> {
+        if let Some(rules) = self.rules.get(&goal.signature()) {
+            Box::new(
+                rules
+                    .iter()
+                    .flat_map(move |rule| self.solve_rule(&goal, rule)),
+            )
+        } else {
+            Box::new(empty())
+        }
+    }
+
+    /// Attempts to solve a goal, using the given rule.
+    pub fn solve_rule<'a>(
+        &'a self,
+        goal: &Literal,
+        rule: &'a Clause,
+    ) -> Box<'a + Iterator<Item = BTreeMap<Variable, Name>>> {
+        use styles::{ERROR, PUNCTUATION};
+        use sparkly::{Doc, Sparkly};
+
+        let opt = rule.head().clone().try_instantiate(goal.clone());
+        if opt.is_none() {
+            return Box::new(empty());
+        }
+        let (head, bindings) = opt.unwrap();
+
+        eprintln!(
+            "{}",
+            Doc::text("TODO:", ERROR)
+                .append(Doc::nbsp())
+                .append(goal.to_doc())
+                .append(Doc::nbsp())
+                .append(rule.to_doc())
+                .append(Doc::text(";", PUNCTUATION))
+                .display()
+        );
+        Box::new(empty())
     }
 }
 
 impl Interpeter for NaiveInterpreter {
     fn run_assertion(&mut self, clause: Clause) -> Result<()> {
-        unimplemented!()
+        if let Some(fact) = clause.as_fact() {
+            self.facts
+                .entry(clause.pred())
+                .or_insert_with(Vec::new)
+                .push(fact)
+        } else {
+            self.rules
+                .entry(clause.pred())
+                .or_insert_with(Vec::new)
+                .push(clause)
+        }
+        Ok(())
     }
 
     fn run_retraction(&mut self, clause: Clause) -> Result<()> {
         unimplemented!()
     }
 
-    fn run_query(&self, query: Literal) -> Result<BTreeMap<Symbol, Literal>> {
-        unimplemented!()
+    fn run_query<'a>(
+        &'a self,
+        query: Literal,
+    ) -> Box<'a + Iterator<Item = BTreeMap<Variable, Name>>> {
+        self.solve(query)
     }
 }

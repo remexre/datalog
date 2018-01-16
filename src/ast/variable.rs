@@ -1,5 +1,8 @@
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
+#[cfg(test)]
+use regex::Regex;
+
 use symbol::Symbol;
 
 /// A variable, for example `X`, `Foo`, or `A123`.
@@ -41,9 +44,26 @@ impl Display for Variable {
 
 fn is_var_char(ch: char) -> bool {
     ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z')
-        || ('0' <= ch && ch <= '9') || ch == '-'
+        || ('0' <= ch && ch <= '9') || ch == '_'
 }
 
 fn is_var_start_char(ch: char) -> bool {
     ('A' <= ch && ch <= 'Z') || ch == '_'
+}
+
+#[cfg(test)]
+lazy_static!{
+    static ref VARIABLE_REGEX: Regex = Regex::new("^[A-Z_][A-Za-z0-9_]*$").unwrap();
+}
+
+#[cfg(test)]
+proptest! {
+    #[test]
+    fn variable_new(ref s in ".*") {
+        if VARIABLE_REGEX.is_match(s) {
+            prop_assert!(Variable::new(s).is_some());
+        } else {
+            prop_assert_eq!(Variable::new(s), None);
+        }
+    }
 }
