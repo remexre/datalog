@@ -10,6 +10,8 @@ extern crate pest_derive;
 #[macro_use]
 extern crate sparkly;
 extern crate symbol;
+#[macro_use]
+extern crate try_opt;
 
 #[cfg(test)]
 #[macro_use]

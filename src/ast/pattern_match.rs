@@ -2,9 +2,9 @@ use Bindings;
 use ast::{Name, Term, Variable};
 
 pub fn pattern_match(
-    mut l: Vec<Term>,
-    mut r: Vec<Term>,
-) -> Option<(Vec<Term>, Vec<Term>, Bindings, Bindings)> {
+    l: &mut [Term],
+    r: &mut [Term],
+) -> Option<(Bindings, Bindings)> {
     assert_eq!(l.len(), r.len());
     let len = l.len();
 
@@ -20,19 +20,19 @@ pub fn pattern_match(
                     return None;
                 }
                 lb.insert(lv.clone(), rv.clone());
-                apply_binding(&mut l, lv, rv);
+                apply_binding(l, lv, rv);
             }
             (Term::Name(lv), Term::Var(rv)) => {
                 if rb.contains_key(&rv) {
                     return None;
                 }
                 rb.insert(rv.clone(), lv.clone());
-                apply_binding(&mut r, rv, lv);
+                apply_binding(r, rv, lv);
             }
             (Term::Var(lv), Term::Var(rv)) => {}
         }
     }
-    Some((l, r, lb, rb))
+    Some((lb, rb))
 }
 
 fn apply_binding(terms: &mut [Term], var: Variable, name: Name) {
@@ -52,12 +52,12 @@ fn literal() {
     let x = Term::new("X").unwrap();
     let y = Term::new("Y").unwrap();
 
-    let l = vec![x.clone(), y.clone(), x.clone(), y.clone()];
-    let r = vec![one.clone(), one.clone(), x.clone(), x.clone()];
+    let mut l = vec![x.clone(), y.clone(), x.clone(), y.clone()];
+    let mut r = vec![one.clone(), one.clone(), x.clone(), x.clone()];
 
-    let (lo, ro, lb, rb) = pattern_match(l, r).unwrap();
-    assert_eq!(lo, vec![one.clone(), one.clone(), one.clone(), one.clone()]);
-    assert_eq!(ro, vec![one.clone(), one.clone(), one.clone(), one.clone()]);
+    let (lb, rb) = pattern_match(&mut l, &mut r).unwrap();
+    assert_eq!(l, vec![one.clone(), one.clone(), one.clone(), one.clone()]);
+    assert_eq!(r, vec![one.clone(), one.clone(), one.clone(), one.clone()]);
     assert_eq!(
         lb,
         vec![

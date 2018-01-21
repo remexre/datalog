@@ -10,7 +10,8 @@ liner = "0.4.4"
 pest = "1.0.0-beta"
 pest_derive = "1.0.0-beta"
 sparkly = { version = "0.1.4", features = ["termion"] }
-symbol = "0.1.0"
+symbol = "0.1.1"
+try_opt = "0.1.1"
 
 [dev-dependencies]
 proptest = "0.4.0"

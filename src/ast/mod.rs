@@ -14,6 +14,7 @@ use Bindings;
 use errors::{Error, Result};
 
 pub use self::name::Name;
+use self::pattern_match::pattern_match;
 pub use self::variable::Variable;
 
 /// A complete program; really just a bunch of statements.
@@ -112,6 +113,20 @@ impl Clause {
         Some(names.into_iter().cloned().collect())
     }
 
+    /// Tries to instantiate the clause against a literal. Returns the literals
+    /// that compose the body of the resulting literal.
+    pub fn try_instantiate(&self, literal: Literal) -> Option<Vec<Literal>> {
+        let Clause(head, body) = self.clone();
+        if head.signature() != literal.signature() {
+            return None;
+        }
+        let Literal(name, mut hargs) = head;
+        let Literal(_, mut largs) = literal;
+
+        let (hb, _) = try_opt!(pattern_match(&mut hargs, &mut largs));
+        unimplemented!("{:?}", hb)
+    }
+
     /// Returns the head of the clause.
     pub fn head(&self) -> &Literal {
         let Clause(ref head, _) = *self;
@@ -136,22 +151,6 @@ impl Literal {
     pub fn signature(&self) -> (Name, usize) {
         let Literal(ref pred, ref args) = *self;
         (pred.clone(), args.len())
-    }
-
-    /// Tries to instantiate the two literals to each other. Returns the
-    /// variable bindings required to do so if it is possible, as well as the
-    /// resulting literal.
-    pub fn try_instantiate(
-        self,
-        other: Literal,
-    ) -> Option<(Literal, Bindings)> {
-        if self.signature() != other.signature() {
-            return None;
-        }
-        let Literal(name, sargs) = self;
-        let Literal(_, oargs) = other;
-
-        unimplemented!()
     }
 
     /// Tries to instantiate this literal to the argument tuple of a fact

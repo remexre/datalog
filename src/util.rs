@@ -1,6 +1,6 @@
 //! Utility functions.
 
-use std::collections::hash_map::{Entry, HashMap};
+use std::collections::HashMap;
 use std::hash::Hash;
 
 /// Applies a function to an entry.

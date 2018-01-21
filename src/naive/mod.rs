@@ -70,21 +70,15 @@ impl NaiveInterpreter {
         use styles::{ERROR, PUNCTUATION};
         use sparkly::{Doc, Sparkly};
 
-        let opt = rule.head().clone().try_instantiate(goal.clone());
+        let opt = rule.try_instantiate(goal.clone());
         if opt.is_none() {
             return Box::new(empty());
         }
-        let (head, bindings) = opt.unwrap();
+        let body = opt.unwrap();
 
         eprintln!(
             "{}",
-            Doc::text("TODO:", ERROR)
-                .append(Doc::nbsp())
-                .append(goal.to_doc())
-                .append(Doc::nbsp())
-                .append(rule.to_doc())
-                .append(Doc::text(";", PUNCTUATION))
-                .display()
+            Doc::text("TODO:", ERROR).append(Doc::lines(body)).display()
         );
         Box::new(empty())
     }
