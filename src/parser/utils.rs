@@ -1,18 +1,16 @@
 use pest::Error;
 use pest::iterators::{Pair, Pairs};
-use pest::inputs::Input;
 
 use parser::Rule;
 
-pub fn as_amb<F, I, T>(
-    pairs: Pairs<Rule, I>,
+pub fn as_amb<'a, F, T>(
+    pairs: Pairs<'a, Rule>,
     a_rule: Rule,
     b_rule: Rule,
     func: F,
-) -> Result<T, Error<Rule, I>>
+) -> Result<T, Error<'a, Rule>>
 where
-    F: Fn(Pairs<Rule, I>, Option<Pairs<Rule, I>>) -> Result<T, Error<Rule, I>>,
-    I: Input,
+    F: Fn(Pairs<'a, Rule>, Option<Pairs<'a, Rule>>) -> Result<T, Error<'a, Rule>>,
 {
     as_ht(pairs, a_rule, |a, mut pairs| {
         if let Some(b) = pairs.next() {
@@ -37,14 +35,13 @@ where
     })
 }
 
-fn as_ht<F, I, T>(
-    mut pairs: Pairs<Rule, I>,
+fn as_ht<'a, F, T>(
+    mut pairs: Pairs<'a, Rule>,
     head_rule: Rule,
     func: F,
-) -> Result<T, Error<Rule, I>>
+) -> Result<T, Error<'a, Rule>>
 where
-    F: Fn(Pairs<Rule, I>, Pairs<Rule, I>) -> Result<T, Error<Rule, I>>,
-    I: Input,
+    F: Fn(Pairs<'a, Rule>, Pairs<'a, Rule>) -> Result<T, Error<'a, Rule>>,
 {
     if let Some(head) = pairs.next() {
         if head.as_rule() == head_rule {
@@ -61,14 +58,13 @@ where
     }
 }
 
-pub fn as_one_any<F, I, T>(
-    mut pairs: Pairs<Rule, I>,
+pub fn as_one_any<'a, F, T>(
+    mut pairs: Pairs<'a, Rule>,
     rule: Rule,
     func: F,
-) -> Result<T, Error<Rule, I>>
+) -> Result<T, Error<'a, Rule>>
 where
-    F: Fn(Pair<Rule, I>) -> Result<T, Error<Rule, I>>,
-    I: Input,
+    F: Fn(Pair<'a, Rule>) -> Result<T, Error<'a, Rule>>,
 {
     if let Some(token) = pairs.next() {
         if let Some(token) = pairs.next() {
@@ -85,14 +81,13 @@ where
     }
 }
 
-pub fn as_one<F, I, T>(
-    pairs: Pairs<Rule, I>,
+pub fn as_one<'a, F, T>(
+    pairs: Pairs<'a, Rule>,
     rule: Rule,
     func: F,
-) -> Result<T, Error<Rule, I>>
+) -> Result<T, Error<'a, Rule>>
 where
-    F: Fn(Pairs<Rule, I>) -> Result<T, Error<Rule, I>>,
-    I: Input,
+    F: Fn(Pairs<'a, Rule>) -> Result<T, Error<'a, Rule>>,
 {
     as_one_any(pairs, rule, |token| {
         if token.as_rule() == rule {

@@ -4,16 +4,16 @@ version = "0.1.0"
 authors = ["Nathan Ringo <remexre@gmail.com>"]
 
 [dependencies]
-clap = "2.29.1"
+clap = "2.29.2"
 error-chain = "0.11.0"
 liner = "0.4.4"
-pest = "1.0.0-beta"
-pest_derive = "1.0.0-beta"
+pest = "1.0.2"
+pest_derive = "1.0.2"
 sparkly = { version = "0.1.4", features = ["termion"] }
 symbol = "0.1.1"
 try_opt = "0.1.1"
 
 [dev-dependencies]
-proptest = "0.4.0"
-regex = "0.2.5"
 lazy_static = "1.0.0"
+proptest = "0.4.2"
+regex = "0.2.5"

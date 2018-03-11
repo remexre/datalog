@@ -8,7 +8,7 @@ macro_rules! ast_parse_test {
         $(
             #[test]
             fn $name() {
-                $(match DatalogParser::parse_str(Rule::$rule, $src)
+                $(match DatalogParser::parse(Rule::$rule, $src)
                         .map_err(|err| panic!("{}", err))
                         .and_then(convert::$converter) {
                     Ok(expr) => assert_eq!(expr, $ast),

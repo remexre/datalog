@@ -67,8 +67,8 @@ impl NaiveInterpreter {
         goal: &Literal,
         rule: &'a Clause,
     ) -> Box<'a + Iterator<Item = BTreeMap<Variable, Name>>> {
-        use styles::{ERROR, PUNCTUATION};
-        use sparkly::{Doc, Sparkly};
+        use styles::ERROR;
+        use sparkly::Doc;
 
         let opt = rule.try_instantiate(goal.clone());
         if opt.is_none() {

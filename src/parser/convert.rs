@@ -2,15 +2,14 @@ use std::char::from_u32 as char_from_u32;
 
 use pest::Error;
 use pest::iterators::{Pair, Pairs};
-use pest::inputs::Input;
 
 use ast::{Clause, Literal, Name, Program, Statement, Term, Variable};
 use parser::Rule;
 use parser::utils::{as_amb, as_one, as_one_any};
 
-pub fn convert_program<I: Input>(
-    pairs: Pairs<Rule, I>,
-) -> Result<Program, Error<Rule, I>> {
+pub fn convert_program<'a>(
+    pairs: Pairs<'a, Rule>,
+) -> Result<Program, Error<'a, Rule>> {
     as_one(pairs, Rule::program, |pairs| {
         pairs
             .map(Pair::into_inner)
@@ -20,15 +19,15 @@ pub fn convert_program<I: Input>(
     })
 }
 
-pub fn convert_statement<I: Input>(
-    pairs: Pairs<Rule, I>,
-) -> Result<Statement, Error<Rule, I>> {
+pub fn convert_statement<'a>(
+    pairs: Pairs<'a, Rule>,
+) -> Result<Statement, Error<'a, Rule>> {
     as_one(pairs, Rule::stmt, convert_statement_one)
 }
 
-pub fn convert_statement_one<I: Input>(
-    pairs: Pairs<Rule, I>,
-) -> Result<Statement, Error<Rule, I>> {
+pub fn convert_statement_one<'a>(
+    pairs: Pairs<'a, Rule>,
+) -> Result<Statement, Error<'a, Rule>> {
     as_one_any(pairs, Rule::stmt, |token| match token.as_rule() {
         Rule::assertion => {
             convert_clause(token.into_inner()).map(Statement::Assertion)
@@ -47,9 +46,9 @@ pub fn convert_statement_one<I: Input>(
     })
 }
 
-pub fn convert_clause<I: Input>(
-    pairs: Pairs<Rule, I>,
-) -> Result<Clause, Error<Rule, I>> {
+pub fn convert_clause<'a>(
+    pairs: Pairs<'a, Rule>,
+) -> Result<Clause, Error<'a, Rule>> {
     as_one(pairs, Rule::clause, |pairs| {
         as_amb(pairs, Rule::literal, Rule::literal_list, |head, body| {
             let head = convert_literal_one(head)?;
@@ -65,15 +64,15 @@ pub fn convert_clause<I: Input>(
     })
 }
 
-pub fn convert_literal<I: Input>(
-    pairs: Pairs<Rule, I>,
-) -> Result<Literal, Error<Rule, I>> {
+pub fn convert_literal<'a>(
+    pairs: Pairs<'a, Rule>,
+) -> Result<Literal, Error<'a, Rule>> {
     as_one(pairs, Rule::literal, convert_literal_one)
 }
 
-pub fn convert_literal_one<I: Input>(
-    pairs: Pairs<Rule, I>,
-) -> Result<Literal, Error<Rule, I>> {
+pub fn convert_literal_one<'a>(
+    pairs: Pairs<'a, Rule>,
+) -> Result<Literal, Error<'a, Rule>> {
     as_amb(pairs, Rule::name, Rule::term_list, |pred, args| {
         let pred = convert_name_one(pred)?;
         let args = if let Some(args) = args {
@@ -86,15 +85,15 @@ pub fn convert_literal_one<I: Input>(
 }
 
 #[cfg(test)]
-pub fn convert_term<I: Input>(
-    pairs: Pairs<Rule, I>,
-) -> Result<Term, Error<Rule, I>> {
+pub fn convert_term<'a>(
+    pairs: Pairs<'a, Rule>,
+) -> Result<Term, Error<'a, Rule>> {
     as_one(pairs, Rule::term, convert_term_one)
 }
 
-pub fn convert_term_one<I: Input>(
-    pairs: Pairs<Rule, I>,
-) -> Result<Term, Error<Rule, I>> {
+pub fn convert_term_one<'a>(
+    pairs: Pairs<'a, Rule>,
+) -> Result<Term, Error<'a, Rule>> {
     as_one_any(pairs, Rule::term, |token| match token.as_rule() {
         Rule::name => convert_name_one(token.into_inner()).map(Term::Name),
         Rule::variable => Ok(Term::Var(convert_variable_one(token))),
@@ -107,15 +106,15 @@ pub fn convert_term_one<I: Input>(
 }
 
 #[cfg(test)]
-pub fn convert_name<I: Input>(
-    pairs: Pairs<Rule, I>,
-) -> Result<Name, Error<Rule, I>> {
+pub fn convert_name<'a>(
+    pairs: Pairs<'a, Rule>,
+) -> Result<Name, Error<'a, Rule>> {
     as_one(pairs, Rule::name, convert_name_one)
 }
 
-pub fn convert_name_one<I: Input>(
-    pairs: Pairs<Rule, I>,
-) -> Result<Name, Error<Rule, I>> {
+pub fn convert_name_one<'a>(
+    pairs: Pairs<'a, Rule>,
+) -> Result<Name, Error<'a, Rule>> {
     as_one_any(pairs, Rule::name, |token| {
         match token.as_rule() {
             Rule::ident => {
@@ -130,12 +129,10 @@ pub fn convert_name_one<I: Input>(
                     .into_inner()
                     .map(convert_char)
                     .collect::<Result<String, _>>()?;
-                Name::new(&string).ok_or_else(|| {
-                    Error::ParsingError {
-                        positives: vec![Rule::name],
-                        negatives: vec![],
-                        pos: token.into_span().start_pos(),
-                    }
+                Name::new(&string).ok_or_else(|| Error::ParsingError {
+                    positives: vec![Rule::name],
+                    negatives: vec![],
+                    pos: token.into_span().start_pos(),
                 })
             }
             _ => Err(Error::ParsingError {
@@ -147,9 +144,9 @@ pub fn convert_name_one<I: Input>(
     })
 }
 
-pub fn convert_char<I: Input>(
-    token: Pair<Rule, I>,
-) -> Result<char, Error<Rule, I>> {
+pub fn convert_char<'a>(
+    token: Pair<'a, Rule>,
+) -> Result<char, Error<'a, Rule>> {
     match token.as_rule() {
         Rule::raw_ch => {
             let mut s = token.as_str().chars();
@@ -171,9 +168,9 @@ pub fn convert_char<I: Input>(
     }
 }
 
-pub fn convert_escape<I: Input>(
-    token: Pair<Rule, I>,
-) -> Result<char, Error<Rule, I>> {
+pub fn convert_escape<'a>(
+    token: Pair<'a, Rule>,
+) -> Result<char, Error<'a, Rule>> {
     match token.as_rule() {
         Rule::hex_esc | Rule::uni4_esc | Rule::uni8_esc => {
             let mut n = 0;
@@ -223,16 +220,14 @@ pub fn convert_escape<I: Input>(
 }
 
 #[cfg(test)]
-pub fn convert_variable<I: Input>(
-    pairs: Pairs<Rule, I>,
-) -> Result<Variable, Error<Rule, I>> {
-    as_one_any(
-        pairs,
-        Rule::variable,
-        |token| Ok(convert_variable_one(token)),
-    )
+pub fn convert_variable<'a>(
+    pairs: Pairs<'a, Rule>,
+) -> Result<Variable, Error<'a, Rule>> {
+    as_one_any(pairs, Rule::variable, |token| {
+        Ok(convert_variable_one(token))
+    })
 }
 
-pub fn convert_variable_one<I: Input>(token: Pair<Rule, I>) -> Variable {
+pub fn convert_variable_one<'a>(token: Pair<'a, Rule>) -> Variable {
     Variable::new(token.as_str()).unwrap()
 }

@@ -7,11 +7,11 @@ mod ast_tests;
 mod cst_tests;
 
 use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::fs::File;
+use std::io::Read;
 use std::path::Path;
-use std::rc::Rc;
 
 use pest::Parser;
-use pest::inputs::FileInput;
 
 use ast::{Program, Statement};
 use errors::Result;
@@ -60,22 +60,22 @@ impl Display for Rule {
 
 /// Parses a program from the given file.
 pub fn parse_program_file<P: AsRef<Path>>(path: P) -> Result<Program> {
-    let input = FileInput::new(path)?;
-    DatalogParser::parse(Rule::program, Rc::new(input))
-        .and_then(convert_program)
-        .map_err(|_err| unimplemented!("Convert parse error")) // TODO
+    let mut f = File::open(path)?;
+    let mut buf = String::new();
+    f.read_to_string(&mut buf)?;
+    parse_program_string(&buf)
 }
 
 /// Parses a program from the given string.
 pub fn parse_program_string(src: &str) -> Result<Program> {
-    DatalogParser::parse_str(Rule::program, src)
+    DatalogParser::parse(Rule::program, src)
         .and_then(convert_program)
         .map_err(|_err| unimplemented!("Convert parse error")) // TODO
 }
 
 /// Parses a statement from the given string.
 pub fn parse_stmt(src: &str) -> Result<Statement> {
-    DatalogParser::parse_str(Rule::stmt, src)
+    DatalogParser::parse(Rule::stmt, src)
         .and_then(convert_statement)
         .map_err(|_err| unimplemented!("Convert parse error")) // TODO
 }

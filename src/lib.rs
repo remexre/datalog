@@ -27,6 +27,7 @@ mod errors;
 mod naive;
 pub(crate) mod parser;
 mod util;
+mod wam;
 
 use std::collections::BTreeMap;
 use std::iter::empty;
